@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHABANAM AUTO | MASTER ADMIN</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;400;900&family=Bebas+Neue&family=Space+Mono&family=Inter:wght@400;900&family=Playfair+Display:wght@900&display=swap');
+        
+        :root { 
+            --accent: #ff1e1e; 
+            --main-txt: #ffffff;
+            --bg-color: #000000;
+            --glass-op: 0.05;
+            --base-font: 'Outfit', sans-serif;
+            --title-font: 'Outfit', sans-serif;
+            --title-size: 130px;
+            --desc-size: 18px;
+            --radius: 0px;
+            --letter-spacing: -0.05em;
+        }
+
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--main-txt); 
+            font-family: var(--base-font);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            transition: background 0.3s ease;
+        }
+
+        #site-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            z-index: -2; transition: 0.8s ease;
+        }
+
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, transparent 0%, var(--bg-color) 100%);
+            z-index: -1;
+        }
+
+        .main-title { 
+            font-family: var(--title-font);
+            font-size: var(--title-size);
+            letter-spacing: var(--letter-spacing);
+        }
+
+        .desc-text { font-size: var(--desc-size); }
+
+        #admin-panel {
+            position: fixed; right: -400px; top: 0; width: 380px; height: 100vh;
+            background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(30px);
+            border-left: 1px solid rgba(255,255,255,0.1); padding: 25px;
+            z-index: 10000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -20px 0 50px rgba(0,0,0,0.8);
+            overflow-y: auto;
+        }
+        #admin-panel.active { right: 0; }
+
+        .is-admin .live-edit { cursor: pointer; border: 1px dashed rgba(255,255,255,0.3); padding: 2px; }
+
+        .btn-accent, .bike-card, .input-dark, .logo-box {
+            border-radius: var(--radius) !important;
+        }
+
+        .btn-accent {
+            background: var(--accent); color: white;
+            padding: 12px 24px; font-weight: 900; text-transform: uppercase;
+            letter-spacing: 2px; font-size: 10px; transition: 0.3s;
+            cursor: pointer; border: none;
+        }
+
+        .bike-card {
+            background: rgba(255,255,255, var(--glass-op)); 
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px); transition: 0.4s;
+        }
+
+        .input-dark {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 10px; font-size: 12px; width: 100%;
+            outline: none; margin-bottom: 10px;
+        }
+
+        .section-label {
+            font-size: 9px; font-weight: 900; color: var(--accent); 
+            letter-spacing: 2px; margin-bottom: 15px; display: block;
+            border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;
+            margin-top: 25px; opacity: 0.8;
+        }
+
+        .admin-stock-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 12px; border-radius: 4px; margin-bottom: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div id="site-canvas"></div>
+    <div class="bg-overlay"></div>
+
+    <div id="admin-panel" class="custom-scrollbar">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h3 class="text-red-600 font-black text-xs uppercase tracking-widest">Master Terminal</h3>
+                <p class="text-[8px] text-gray-500">ENGINE CONFIGURATION ACTIVE</p>
+            </div>
+            <button onclick="logout()" class="text-[9px] text-gray-500 hover:text-white border border-white/10 px-2 py-1">LOGOUT</button>
+        </div>
+        
+        <div class="space-y-2">
+            <section>
+                <span class="section-label">01. BUSINESS CONFIG</span>
+                <label class="text-[8px] text-gray-400 block mb-1">CONTACT NUMBER</label>
+                <input type="text" id="set-phone" oninput="syncBusinessInfo()" placeholder="e.g. 7014161835" class="input-dark">
+                
+                <label class="text-[8px] text-gray-400 block mb-1">OFFICE LOCATION</label>
+                <input type="text" id="set-location" oninput="syncBusinessInfo()" placeholder="e.g. Pali, Rajasthan" class="input-dark">
+                
+                <span class="section-label">02. INVENTORY ASSETS</span>
+                <input type="text" id="p-name" placeholder="Model Name" class="input-dark">
+                <input type="text" id="p-price" placeholder="Price (e.g. ₹ 2,50,000)" class="input-dark">
+                <input type="text" id="p-img" placeholder="Image URL" class="input-dark">
+                <textarea id="p-desc" placeholder="Details" class="input-dark h-16"></textarea>
+                <button onclick="addBike()" class="btn-accent w-full py-3">Add to Showroom</button>
+                <div id="admin-inventory-list" class="mt-4 max-h-40 overflow-y-auto custom-scrollbar"></div>
+            </section>
+
+            <section>
+                <span class="section-label">03. VISUAL ENGINE</span>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="text-[8px] text-gray-400 block mb-1">ACCENT COLOR</label>
+                        <input type="color" id="set-accent" oninput="syncDesign()" class="w-full h-8 bg-transparent border-0">
+                    </div>
+                    <div>
+                        <label class="text-[8px] text-gray-400 block mb-1">CANVAS BG</label>
+                        <input type="color" id="set-bg-color" oninput="syncDesign()" class="w-full h-8 bg-transparent border-0">
+                    </div>
+                </div>
+
+                <label class="text-[8px] text-gray-400 block mb-1">BACKGROUND IMAGE URL</label>
+                <input type="text" id="set-bg-img" oninput="syncDesign()" placeholder="Wallpaper URL" class="input-dark">
+
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="text-[8px] text-gray-400 block mb-1">TITLE FONT</label>
+                        <select id="set-font-title" onchange="syncDesign()" class="input-dark bg-zinc-900">
+                            <option value="'Outfit', sans-serif">Outfit (Modern)</option>
+                            <option value="'Bebas Neue', cursive">Bebas (Bold)</option>
+                            <option value="'Playfair Display', serif">Playfair (Elegant)</option>
+                            <option value="'Space Mono', monospace">Space (Tech)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[8px] text-gray-400 block mb-1">UI SHAPE (RADIUS)</label>
+                        <input type="range" id="set-radius" min="0" max="30" value="0" oninput="syncDesign()" class="w-full accent-red-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[8px] text-gray-400 block mb-1">TITLE SIZE (px)</label>
+                        <input type="number" id="set-title-size" value="130" oninput="syncDesign()" class="input-dark">
+                    </div>
+                    <div>
+                        <label class="text-[8px] text-gray-400 block mb-1">DESC SIZE (px)</label>
+                        <input type="number" id="set-desc-size" value="18" oninput="syncDesign()" class="input-dark">
+                    </div>
+                </div>
+            </section>
+            
+            <div class="pt-6 space-y-2">
+                <button onclick="publishChanges()" class="w-full bg-green-600 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-green-500 transition">
+                    Commit Changes to DB
+                </button>
+                <button onclick="closePanel()" class="w-full border border-white/10 py-3 text-[10px] uppercase text-gray-400">Close Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="fixed top-0 w-full z-[100] px-10 py-8 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-red-600 flex items-center justify-center font-black text-xl italic logo-box">S</div>
+            <h1 id="b-name" class="live-edit font-black text-2xl uppercase tracking-tighter">SHABANAM</h1>
+        </div>
+        <div class="flex gap-6 items-center">
+            <a id="phone-display" href="tel:7014161835" class="text-[11px] font-black tracking-widest text-white hover:text-red-500 transition">
+                <i class="fa-solid fa-phone mr-1"></i> <span id="phone-number-text">7014161835</span>
+            </a>
+            <button onclick="loginRequest()" class="text-[9px] font-bold tracking-widest uppercase text-white/30 hover:text-white">Admin</button>
+            <a href="#showroom-section" class="btn-accent">Showroom</a>
+        </div>
+    </nav>
+
+    <section class="h-screen flex flex-col justify-center px-10 md:px-32">
+        <h2 id="h-sub" class="live-edit text-red-600 font-bold tracking-[0.8em] text-xs uppercase mb-6 sub-label">Master Babu Khan Signature</h2>
+        <h1 id="h-main" class="live-edit font-black leading-[0.85] uppercase mb-8 main-title">ULTRA<br><span style="-webkit-text-stroke: 1px white; color: transparent;">PERFORMANCE</span></h1>
+        <p id="h-desc" class="live-edit text-gray-400 max-w-xl desc-text">Pali's elite workshop for high-end automobile restoration and precision tuning.</p>
+        <p class="text-white/50 text-[10px] uppercase tracking-[0.3em] mt-4"><i class="fa-solid fa-location-dot mr-2 text-red-600"></i> <span id="location-display">Pali, Rajasthan</span></p>
+    </section>
+
+    <section id="showroom-section" class="py-32 px-10 bg-zinc-950">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-16">
+                <h2 class="text-5xl font-black uppercase mb-4 main-title">Current <span class="text-red-600 sub-label">Inventory</span></h2>
+                <div class="w-20 h-1 bg-red-600 mb-6 sub-label-bg"></div>
+            </div>
+            <div id="showroom" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-gray-600 text-[10px] uppercase tracking-widest">
+        <p class="mb-2">Contact: <span id="footer-phone">7014161835</span> | Location: <span id="footer-location">Pali, Rajasthan</span></p>
+        Secure Master Portal &copy; 2026 | Shabanam Auto
+    </footer>
+
+    <script>
+        const MASTER_KEY = "786786";
+        let isAdmin = false;
+
+        let DB = JSON.parse(localStorage.getItem('shabanam_secure_db')) || {
+            phone: '7014161835',
+            location: 'Pali, Rajasthan',
+            accent: '#ff1e1e',
+            textMain: '#ffffff',
+            bgColor: '#000000',
+            bgImg: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=2000',
+            titleFont: "'Outfit', sans-serif",
+            titleSize: '130',
+            descSize: '18',
+            radius: '0',
+            content: {},
+            stock: [
+                { name: "Harley Davidson X440", price: "₹ 2,35,000", img: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=500", desc: "Showroom condition, First owner." }
+            ]
+        };
+
+        function loginRequest() {
+            if (isAdmin) { togglePanel(); return; }
+            const pass = prompt("ENTER SYSTEM PASSCODE:");
+            if (pass === MASTER_KEY) {
+                isAdmin = true;
+                document.body.classList.add('is-admin');
+                document.querySelectorAll('.live-edit').forEach(el => el.contentEditable = true);
+                renderInventoryManager();
+                loadAdminInputs();
+                togglePanel();
+            } else { alert("Access Denied."); }
+        }
+
+        function togglePanel() { document.getElementById('admin-panel').classList.toggle('active'); }
+        function closePanel() { document.getElementById('admin-panel').classList.remove('active'); }
+
+        function loadAdminInputs() {
+            document.getElementById('set-phone').value = DB.phone || '7014161835';
+            document.getElementById('set-location').value = DB.location || 'Pali, Rajasthan';
+            document.getElementById('set-accent').value = DB.accent;
+            document.getElementById('set-bg-color').value = DB.bgColor;
+            document.getElementById('set-bg-img').value = DB.bgImg;
+            document.getElementById('set-font-title').value = DB.titleFont;
+            document.getElementById('set-radius').value = DB.radius.replace('px','');
+            document.getElementById('set-title-size').value = DB.titleSize.replace('px','');
+            document.getElementById('set-desc-size').value = DB.descSize.replace('px','');
+        }
+
+        function syncBusinessInfo() {
+            DB.phone = document.getElementById('set-phone').value;
+            DB.location = document.getElementById('set-location').value;
+            
+            document.getElementById('phone-number-text').innerText = DB.phone;
+            document.getElementById('footer-phone').innerText = DB.phone;
+            document.getElementById('phone-display').href = `tel:${DB.phone}`;
+            
+            document.getElementById('location-display').innerText = DB.location;
+            document.getElementById('footer-location').innerText = DB.location;
+        }
+
+        function syncDesign() {
+            DB.accent = document.getElementById('set-accent').value;
+            DB.bgColor = document.getElementById('set-bg-color').value;
+            DB.bgImg = document.getElementById('set-bg-img').value;
+            DB.titleFont = document.getElementById('set-font-title').value;
+            DB.radius = document.getElementById('set-radius').value + "px";
+            DB.titleSize = document.getElementById('set-title-size').value + "px";
+            DB.descSize = document.getElementById('set-desc-size').value + "px";
+
+            const root = document.documentElement;
+            root.style.setProperty('--accent', DB.accent);
+            root.style.setProperty('--bg-color', DB.bgColor);
+            root.style.setProperty('--title-font', DB.titleFont);
+            root.style.setProperty('--radius', DB.radius);
+            root.style.setProperty('--title-size', DB.titleSize);
+            root.style.setProperty('--desc-size', DB.descSize);
+            
+            document.getElementById('site-canvas').style.backgroundImage = `url(${DB.bgImg})`;
+            document.querySelectorAll('.logo-box, .btn-accent, .sub-label-bg').forEach(el => el.style.backgroundColor = DB.accent);
+            document.querySelectorAll('.sub-label').forEach(el => el.style.color = DB.accent);
+        }
+
+        function renderInventoryManager() {
+            const list = document.getElementById('admin-inventory-list');
+            list.innerHTML = DB.stock.map((item, i) => `
+                <div class="admin-stock-item flex justify-between items-center">
+                    <div>
+                        <p class="text-white font-black text-[10px] uppercase">${item.name}</p>
+                        <p class="text-red-500 text-[9px]">${item.price}</p>
+                    </div>
+                    <button onclick="removeBike(${i})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function renderStock() {
+            const container = document.getElementById('showroom');
+            container.innerHTML = DB.stock.map((item) => `
+                <div class="bike-card group overflow-hidden animate__animated animate__fadeInUp">
+                    <div class="h-64 overflow-hidden">
+                        <img src="${item.img}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-black uppercase text-lg mb-1">${item.name}</h4>
+                        <p class="text-2xl font-black mb-4" style="color: var(--accent)">${item.price}</p>
+                        <p class="text-xs text-gray-400 leading-relaxed mb-6">${item.desc}</p>
+                        <button class="w-full border border-white/20 py-3 text-[9px] font-black uppercase hover:bg-white hover:text-black transition" style="border-radius: var(--radius)">Inquire Now</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addBike() {
+            const name = document.getElementById('p-name').value;
+            const price = document.getElementById('p-price').value;
+            const img = document.getElementById('p-img').value;
+            const desc = document.getElementById('p-desc').value;
+            if(name && price) {
+                DB.stock.unshift({ name, price, img, desc });
+                renderStock();
+                renderInventoryManager();
+            }
+        }
+
+        function removeBike(i) {
+            DB.stock.splice(i, 1);
+            renderStock();
+            renderInventoryManager();
+        }
+
+        function publishChanges() {
+            document.querySelectorAll('.live-edit').forEach(el => {
+                DB.content[el.id] = el.innerHTML;
+            });
+            localStorage.setItem('shabanam_secure_db', JSON.stringify(DB));
+            alert("SYSTEM UPDATED.");
+        }
+
+        function logout() { location.reload(); }
+
+        window.onload = () => {
+            syncDesign();
+            renderStock();
+            // Initial Load Business Info
+            document.getElementById('phone-number-text').innerText = DB.phone || '7014161835';
+            document.getElementById('footer-phone').innerText = DB.phone || '7014161835';
+            document.getElementById('phone-display').href = `tel:${DB.phone || '7014161835'}`;
+            document.getElementById('location-display').innerText = DB.location || 'Pali, Rajasthan';
+            document.getElementById('footer-location').innerText = DB.location || 'Pali, Rajasthan';
+            
+            Object.keys(DB.content).forEach(id => {
+                if(document.getElementById(id)) document.getElementById(id).innerHTML = DB.content[id];
+            });
+        };
+    </script>
+</body>
+</html>
+
+
+  </head>
+    
+  <body>
+  
+    
+  </body>
+  
+</html>
